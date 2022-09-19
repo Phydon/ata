@@ -1,13 +1,17 @@
-extern crate umya_spreadsheet;
-use umya_spreadsheet::{reader, writer};
+mod utils;
+mod excel;
+
+use utils::*;
+use excel::*;
+
 use flexi_logger::{detailed_format, Duplicate, FileSpec, Logger};
 use log::{info, warn, error};
-use chrono::Local;
 
-use std:: {
-    path::Path,
-    error::Error,
-};
+use std::path::Path;
+
+const INPUT_XLXS: &str = "test.xlsx";
+const OUTPUT_XLXS: &str = "output.xlsx";
+const SHEETNAME: &str = "Sheet1";
 
 fn main() {
     // initialize the logger
@@ -24,52 +28,10 @@ fn main() {
     warn!("{:?}", date);
     error!("{:?}", time);
 
-    match excel() {
-        Ok(()) => info!("Success"),
-        Err(err) => error!("{err}"),
-    }
-}
-
-pub fn get_date_and_time() -> (String, String) {
-    // panics when adding '%.3f' or something similar
-    // -> chrono error
-    let date = Local::now().format("%d.%m.%Y").to_string();
-    let time = Local::now().format("%R").to_string();
-
-    (date, time)
-}
-
-pub fn excel() -> Result<(), Box<dyn Error>> {
-    let path = Path::new("./test.xlsx");
-    let path2 = Path::new("./output.xlsx");
-    let sheetname = "Sheet1";
-
-    // READER
-    let mut book = reader::xlsx::read(path).expect("Unable to read xlsx file: {path}");
-
-    // read value in cell A1
-    let a_one_value = book.get_sheet_by_name(sheetname)?.get_value("A1");
-    println!("A1 = {}", a_one_value);
-
-    // Change value
-    book.get_sheet_by_name_mut(sheetname)?.get_cell_by_column_and_row_mut(&1, &2).set_value("WASDWASD");
-    let a_two_value = book.get_sheet_by_name(sheetname)?.get_value("A2");
-    println!("A2 = {}", a_two_value);
-
-    // Max col and max row
-    let max_col_and_row: (u32, u32) = book
-        .get_sheet_by_name(sheetname)?
-        .get_highest_column_and_row();
-
-    let max_col = max_col_and_row.0;
-    let max_row = max_col_and_row.1;
-    info!("{:?}, {:?}", max_col, max_row);
-
-    // insert rows
-    book.insert_new_row(sheetname, &max_col, &max_row);
-
-    // WRITER
-    let _ = writer::xlsx::write(&book, path2);
-
-    Ok(())
+    let mut book = read_excel(Path::new(INPUT_XLXS)).unwrap();
+    read_value(&book, SHEETNAME, "A1").unwrap();
+    let max: (u32, u32) = get_max_col_and_row(&book, SHEETNAME).unwrap();
+    append_new_row(&mut book, SHEETNAME).unwrap();
+    change_value(&mut book, SHEETNAME, max.0, max.1, "TESTING".to_string()).unwrap();
+    write_excel(&book, Path::new(OUTPUT_XLXS)).unwrap();
 }
