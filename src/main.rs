@@ -1,11 +1,11 @@
-mod utils;
 mod excel;
+mod utils;
 
-use utils::*;
 use excel::*;
+use utils::get_date_and_time;
 
 use flexi_logger::{detailed_format, Duplicate, FileSpec, Logger};
-use log::{info, warn, error};
+use log::{error, info, warn};
 
 use std::path::Path;
 
@@ -32,6 +32,10 @@ fn main() {
     read_value(&book, SHEETNAME, "A1").unwrap();
     let max: (u32, u32) = get_max_col_and_row(&book, SHEETNAME).unwrap();
     append_new_row(&mut book, SHEETNAME).unwrap();
-    change_value(&mut book, SHEETNAME, max.0, max.1, "TESTING".to_string()).unwrap();
-    write_excel(&book, Path::new(OUTPUT_XLXS)).unwrap();
+    change_value(&mut book, SHEETNAME, max.0, max.1, "TESTING".to_string())
+        .unwrap();
+    match write_excel(&book, Path::new(OUTPUT_XLXS)) {
+        Ok(_) => info!("Success"),
+        Err(err) => error!("{err:?}"),
+    }
 }
