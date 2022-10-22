@@ -28,9 +28,6 @@ def main():
         
     workbook.save(filename="test.xlsx")
     
-def test();
-    fd = dt.datetime.datetime.datetime.datetime.datetime.datetime.datetime.datetime.datetime.datetime.datetime.datetime.datetime.datetime.datetime()
-    
     
 if __name__ == "__main__":
     main()
