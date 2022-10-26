@@ -3,7 +3,7 @@ from openpyxl import load_workbook
 
 
 def main():
-    workbook = load_workbook(filename="C:/Users/Pohl/main/Rust/ata/test.xlsx")
+    workbook = load_workbook(filename="~/main/Rust/ata/test.xlsx")
     sheet = workbook.active
 
     max_row = 0
@@ -28,7 +28,7 @@ def main():
     delta = round((first_break - random_start).total_seconds() / (60 * 60), 2)
     sheet.cell(row=max_row + 1, column=5, value=delta)
         
-    workbook.save(filename="C:/Users/Pohl/main/Rust/ata/test.xlsx")
+    workbook.save(filename="~/main/Rust/ata/test.xlsx")
     
     
 if __name__ == "__main__":
