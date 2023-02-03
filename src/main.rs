@@ -15,7 +15,7 @@ const SHEETNAME: &str = "Sheet1";
 
 fn main() {
     // initialize the logger
-    let _logger = Logger::try_with_str("info") // log info, warn and error
+    let _logger = Logger::try_with_str("info") // log warn and error
         .unwrap()
         .format_for_files(detailed_format) // use timestamp for every log
         .log_to_file(FileSpec::default().suppress_timestamp()) // no timestamps in the filename
@@ -28,12 +28,18 @@ fn main() {
     warn!("{:?}", date);
     error!("{:?}", time);
 
-    let mut book = read_excel(Path::new(INPUT_XLXS)).unwrap();
+    let mut book = read_excel(Path::new(OUTPUT_XLXS)).unwrap();
     read_value(&book, SHEETNAME, "A1").unwrap();
     let max: (u32, u32) = get_max_col_and_row(&book, SHEETNAME).unwrap();
     append_new_row(&mut book, SHEETNAME).unwrap();
-    change_value(&mut book, SHEETNAME, max.0, max.1, "TESTING".to_string())
-        .unwrap();
+    change_value(
+        &mut book,
+        SHEETNAME,
+        max.0 - (max.0 - 1),
+        max.1 + 1,
+        "NEW_VALUE_HERE".to_string(),
+    )
+    .unwrap();
     match write_excel(&book, Path::new(OUTPUT_XLXS)) {
         Ok(_) => info!("Success"),
         Err(err) => error!("{err:?}"),

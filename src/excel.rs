@@ -21,6 +21,7 @@ pub fn read_value(
     val: &str,
 ) -> Result<String, Box<dyn Error>> {
     let result = book.get_sheet_by_name(sheetname)?.get_value(val);
+    info!("Read Value {:?}: {:?}", val, result);
 
     Ok(result)
 }
@@ -44,9 +45,9 @@ pub fn append_new_row(
 
     let max_col = max_col_and_row.0;
     let max_row = max_col_and_row.1;
-    info!("{:?}, {:?}", max_col, max_row);
+    info!("Max Column and Row: {:?}, {:?}", max_col, max_row);
 
-    book.insert_new_row(sheetname, &max_col, &max_row);
+    book.insert_new_row(sheetname, &(max_col + 1), &(max_row + 1));
 
     Ok(())
 }
@@ -67,6 +68,9 @@ pub fn change_value<'a>(
 
 pub fn write_excel(book: &Spreadsheet, path: &Path) -> Result<(), XlsxError> {
     let _ = writer::xlsx::write(&book, path)?;
+    // TODO remove this
+    // let path = std::path::Path::new("./wasd.xlsx");
+    // let _ = umya_spreadsheet::writer::xlsx::write(&book, path);
 
     Ok(())
 }
